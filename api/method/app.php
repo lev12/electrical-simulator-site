@@ -307,7 +307,7 @@ class App
 		$listFile = $this->files;
 		$size = NULL;
 		foreach ($listFile as $item) {
-			$path = $this->pathToAppFolder . $item;
+			$path = $item;
 			$temp = filesize ($path);
 			$size = $size + $temp;
 		}
