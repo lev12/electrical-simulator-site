@@ -59,7 +59,7 @@ class Config
             }
             else
             {
-                $this->listValue[] = substr($cfgData[$i], count($cfgData[$i])-1, count($cfgData[$i])-2);
+                $this->listValue[] = substr($cfgData[$i], 0, iconv_strlen($cfgData[$i])-1);
             }
         }
 
@@ -73,7 +73,11 @@ class Config
             if ($key == $this->listKey[$i])
             {
                 $response = explode(", ", $this->listValue[$i] );
-                return $response;
+                if (count($response) > 1)
+                {
+                	return $response;
+                }
+                return $response[0];
             }
         }
         return false;
@@ -98,7 +102,7 @@ class Config
 
 class App
 {
-	private  $pathToAppFolder = 'C:\OpenServer\domains\electrical-simulator.ru\app';
+	private  $pathToAppFolder = 'E:\games\ospanel\domains\electrical-simulator.ru\app';
 	public $app;
 	public $appPath;
 	public $files;
@@ -149,27 +153,28 @@ class App
 		{
 			return false;
 		}
-		$configFile = fopen($configVersionPath, 'r');
-		$config = fread($configFile,  4096);
+		$config = new Config ($configVersionPath);
 
-		$datatemp = explode (" ", $config);
+		$dataVerType = $config->get ("Version_Type");
+		$dataVerNum = $config->get ("Version_Number");
+		$dataStartFile = $config->get ("Start_File");
 
-		if (  $datatemp[0] == "pre-alpha"
-			||$datatemp[0] == "alpha"
-			||$datatemp[0] == "beta"
-			||$datatemp[0] == "release")
+		if (  $dataVerType == "pre-alpha"
+			||$dataVerType == "alpha"
+			||$dataVerType == "beta"
+			||$dataVerType == "release")
 		{
-			if ($datatemp[1] != 0)
+			if ($dataVerNum != 0)
 			{
-				$exeVersionPath = $versionPath ."/". $datatemp[2];
+
+				$exeVersionPath = $versionPath ."/". $dataStartFile;
 				if (file_exists($exeVersionPath))
 				{
-					fclose($configFile);
 					return true;
 				}
 			}
 		}
-        fclose($configFile);
+        //fclose($configFile);
 		return false;
 	}
 
@@ -343,7 +348,7 @@ class App
 $token = $_GET["token"];
 $get = $method[1];
 $appName = $_GET["app"];
-$versionName = $_GET["version"];
+$versionName = $_GET["ver"];
 $app = choiceApp($appName);
 $fileName = $_GET["file"];
 
@@ -367,25 +372,24 @@ switch ($get) {
 		echo json_encode(get_actual_version($app));
 		break;
 	case 'getVersionList':
-        $cfg = new Config ('C:\OpenServer\domains\electrical-simulator.ru\app\Electrical_Simulator\alpha_45\data version.ini');
 		echo json_encode(get_version_list($app));
 		break;
 	case 'checkVersion':
 		echo json_encode(check_version($app, $versionName));
 		break;
-	case 'getExeFile':
+	case 'exeFile':
 		echo json_encode(get_exe_file($app, $versionName));
 		break;
-	case 'getFileList':
+	case 'fileList':
 		echo json_encode(get_file_list($app, $versionName));
 		break;
-	case 'getSizeVersion':
+	case 'sizeVersion':
 		echo json_encode(get_size_version($app, $versionName));
 		break;
-	case 'getFileSize':
+	case 'fileSize':
 		echo json_encode(get_file_size($app, $versionName, $fileName));
 		break;
-	case 'getVersionInfo':
+	case 'versionInfo':
 		echo json_encode(get_info_version($app, $versionName));
 		break;
 	default:
