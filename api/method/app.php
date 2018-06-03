@@ -293,18 +293,19 @@ class App
 		$path = $this->appPath . '/' . $verName;
 		$this->fillingFileList ($path);
 		$response = NULL;
+		$tempResponse = NULL;
 		$tempStr = array_unique ($this->files);
 		$tempListSleh = explode("/", $tempStr[0]);
 		$tempListSleh = array_values($tempListSleh);
 		$tempSleh = NULL;
 		for ($i=0; $i < 3; $i++) {
-			$tempSleh = $tempSleh . "/" . $tempListSleh[$i];
+			$tempSleh = $tempSleh . '/' . $tempListSleh[$i];
 		}
 		$remInd = strlen ($tempSleh);
 		foreach ($tempStr as $temp) {
-			$response[] = substr($temp, $remInd);
+			$tempResponse[] = substr($temp, $remInd);
 		}
-		return $response;
+		return $tempResponse;
 	}
 	public function getSizeVersion($verName)
 	{
