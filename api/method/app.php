@@ -344,6 +344,19 @@ class App
 
 		return $response;
 	}
+
+	public function getInfoApp()
+	{
+		$response = NULL;
+		$pathToConfig = $this->appPath . "/" . "app.ini";
+		$cfg = new Config ($pathToConfig);
+		$key = $cfg->getKeyList();
+		foreach ($key as $item) {
+			$response[] = array($item,$cfg->get($item));
+		}
+
+		return $response;
+	}
 }
 
 $token = $_GET["token"];
@@ -392,6 +405,9 @@ switch ($get) {
 		break;
 	case 'versionInfo':
 		echo json_encode(get_info_version($app, $versionName));
+		break;
+	case 'applicationInfo':
+		echo json_encode(get_info_application($app));
 		break;
 	default:
 		echo json_encode(errorComand());
@@ -456,6 +472,13 @@ function get_file_size($app, $versionName, $fileName)
 function get_info_version($app, $versionName)
 {
 	$info = $app->getInfoVersion($versionName);
+	$response = array("response" => array('info' => $info));
+	return $response;
+}
+
+function get_info_application($app)
+{
+	$info = $app->getInfoApp();
 	$response = array("response" => array('info' => $info));
 	return $response;
 }
