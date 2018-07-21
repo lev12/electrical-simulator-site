@@ -102,7 +102,7 @@ class Config
 
 class App
 {
-	private  $pathToAppFolder = 'E:\games\ospanel\domains\electrical-simulator.ru\app';
+	private  $pathToAppFolder = '././app';
 	public $app;
 	public $appPath;
 	public $files;
@@ -110,14 +110,13 @@ class App
 	{
 		$this->app = $appName;
 		$this->appPath = $this->pathToAppFolder . "/" . $appName;
+		$this->appPath = realpath ($this->appPath);
 		$this->fillingVersionList ();
 	}
 
 	public function fillingVersionList()
 	{
 		$versionListTemp = scandir($this->appPath);
-		unset ($versionListTemp[0]);
-		unset ($versionListTemp[1]);
 		$versionListTemp = array_values($versionListTemp);
 
 		for ($i=0; $i < count($versionListTemp); $i++) 
@@ -180,11 +179,10 @@ class App
 
 	public function sortVersion($verList)
 	{
-		$verPreAlpha = NULL;
-		$verPreAlpha = NULL;
-		$verAlpha = NULL;
-		$verBeta = NULL;
-		$verRelease = NULL;
+		$verPreAlpha = array();
+		$verAlpha = array();
+		$verBeta = array();
+		$verRelease = array();
 
 		for ($i=0; $i < count($verList); $i++) 
 		{
@@ -295,13 +293,9 @@ class App
 		$response = NULL;
 		$tempResponse = NULL;
 		$tempStr = array_unique ($this->files);
-		$tempListSleh = explode("/", $tempStr[0]);
-		$tempListSleh = array_values($tempListSleh);
-		$tempSleh = NULL;
-		for ($i=0; $i < 3; $i++) {
-			$tempSleh = $tempSleh . '/' . $tempListSleh[$i];
-		}
-		$remInd = strlen ($tempSleh);
+
+		$remInd = strlen ($path) + 1;
+		//var_dump($tempSleh);
 		foreach ($tempStr as $temp) {
 			$tempResponse[] = substr($temp, $remInd);
 		}
@@ -339,7 +333,7 @@ class App
         $cfg = new Config ($pathToConfig);
 		$key = $cfg->getKeyList();
 		foreach ($key as $item) {
-			$response[] = array($item,$cfg->get($item));
+			$response[] = array($item => $cfg->get($item));
 		}
 
 		return $response;
@@ -352,7 +346,7 @@ class App
 		$cfg = new Config ($pathToConfig);
 		$key = $cfg->getKeyList();
 		foreach ($key as $item) {
-			$response[] = array($item,$cfg->get($item));
+			$response[] = array($item => $cfg->get($item));
 		}
 
 		return $response;
@@ -382,35 +376,38 @@ function choiceApp($appName)
 }
 
 switch ($get) {
-	case 'getActualVersion':
+	case 'actualVersion':
 		echo json_encode(get_actual_version($app));
 		break;
-	case 'getVersionList':
-		echo json_encode(get_version_list($app));
+	case 'versionList':
+		echo json_encode(get_version_list($app), JSON_UNESCAPED_SLASHES);
+		break;
+	case 'applicationList':
+		echo json_encode(get_application_list(), JSON_UNESCAPED_SLASHES);	
 		break;
 	case 'checkVersion':
-		echo json_encode(check_version($app, $versionName));
+		echo json_encode(check_version($app, $versionName), JSON_UNESCAPED_SLASHES);
 		break;
 	case 'exeFile':
-		echo json_encode(get_exe_file($app, $versionName));
+		echo json_encode(get_exe_file($app, $versionName), JSON_UNESCAPED_SLASHES);
 		break;
 	case 'fileList':
-		echo json_encode(get_file_list($app, $versionName));
+		echo json_encode(get_file_list($app, $versionName), JSON_UNESCAPED_SLASHES);
 		break;
 	case 'sizeVersion':
-		echo json_encode(get_size_version($app, $versionName));
+		echo json_encode(get_size_version($app, $versionName), JSON_UNESCAPED_SLASHES);
 		break;
 	case 'fileSize':
-		echo json_encode(get_file_size($app, $versionName, $fileName));
+		echo json_encode(get_file_size($app, $versionName, $fileName), JSON_UNESCAPED_SLASHES);
 		break;
 	case 'versionInfo':
-		echo json_encode(get_info_version($app, $versionName));
+		echo json_encode(get_info_version($app, $versionName), JSON_UNESCAPED_SLASHES);
 		break;
 	case 'applicationInfo':
-		echo json_encode(get_info_application($app));
+		echo json_encode(get_info_application($app), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK);
 		break;
 	default:
-		echo json_encode(errorComand());
+		echo json_encode(errorComand(), JSON_UNESCAPED_SLASHES);
 		break;
 }
 
@@ -480,6 +477,15 @@ function get_info_application($app)
 {
 	$info = $app->getInfoApp();
 	$response = array("response" => array('info' => $info));
+	return $response;
+}
+
+function get_application_list()
+{
+	$info = scandir('././app');
+	array_shift ($info);
+	array_shift ($info);
+	$response = array("response" => array('applicationList' => $info));
 	return $response;
 }
 ?>
