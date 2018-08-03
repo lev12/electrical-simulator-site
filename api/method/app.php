@@ -99,7 +99,6 @@ class Config
     }*/
 }
 
-
 class App
 {
 	private  $pathToAppFolder = '././app';
@@ -119,8 +118,8 @@ class App
 		$versionListTemp = scandir($this->appPath);
 		$versionListTemp = array_values($versionListTemp);
 
-		for ($i=0; $i < count($versionListTemp); $i++) 
-		{ 
+		for ($i=0; $i < count($versionListTemp); $i++)
+		{
 			if (!is_dir($this->appPath . '/' . $this->versionListTemp[$i]))
 			{
 				unset ($versionListTemp[$i]);
@@ -140,14 +139,14 @@ class App
 
     public function checkVersionName ($name)
 	{
-		$versionPath = $this->appPath . "/" . $name;
+		$versionPath = $this->appPath . "\\" . $name;
 
 		if (is_file($versionPath))
 		{
 			return "no_cor_path";
 		}
 
-		$configVersionPath = $versionPath . "/data version.ini";
+		$configVersionPath = $versionPath . "\\data version.ini";
 		if (!is_readable ($configVersionPath))
 		{
 			return false;
@@ -165,15 +164,10 @@ class App
 		{
 			if ($dataVerNum != 0)
 			{
-
-				$exeVersionPath = $versionPath ."/". $dataStartFile;
-				if (file_exists($exeVersionPath))
-				{
-					return true;
-				}
+				$exeVersionPath = $versionPath ."\\". $dataStartFile;
+				return file_exists($exeVersionPath);
 			}
 		}
-        //fclose($configFile);
 		return false;
 	}
 
@@ -184,11 +178,11 @@ class App
 		$verBeta = array();
 		$verRelease = array();
 
-		for ($i=0; $i < count($verList); $i++) 
+		for ($i=0; $i < count($verList); $i++)
 		{
-			
+
 			$type = explode("_", $verList[$i])[0];
-			switch ($type) 
+			switch ($type)
 			{
 				case "pre-alpha":
 					$verPreAlpha [] = $verList[$i];
@@ -214,7 +208,7 @@ class App
 		if (count($verBeta) != 0)     $retList =array_merge($retList, $verBeta);
 		if (count($verRelease) != 0)  $retList =array_merge($retList, $verRelease);
 		$retList = array_values($retList);
-		
+
 		return $retList;
 	}
 
@@ -257,11 +251,11 @@ class App
 	    global $filesTemp;
 		foreach ($tempDir as $temp) {
 			$pathTemp = $dir . "/" . $temp;
-		 	if (is_dir($pathTemp)) 
+		 	if (is_dir($pathTemp))
 		 	{
 		 		array_push($dirList ,$temp);
 		 	}
-		 	else 
+		 	else
 		 	{
 		 		$filesTemp[] = $pathTemp;
 			}
@@ -275,14 +269,14 @@ class App
 			}
 			$filesTemp = array_values($filesTemp);
 			$this->files = array_merge($this->files, $filesTemp);
-			
+
 		}
 		$this->files = array_values($this->files);
 		foreach ($dirList as $temp) {
 			$path = $dir . "/" . $temp;
 			$this->fillingFileList($path);
 		}
-		
+
 	}
 
 	public function getFileList($verName)
@@ -386,7 +380,7 @@ switch ($get) {
 		echo json_encode(get_application_list(), JSON_UNESCAPED_SLASHES);	
 		break;
 	case 'checkVersion':
-		echo json_encode(check_version($app, $versionName), JSON_UNESCAPED_SLASHES);
+		echo json_encode(get_check_version($app, $versionName), JSON_UNESCAPED_SLASHES);
 		break;
 	case 'exeFile':
 		echo json_encode(get_exe_file($app, $versionName), JSON_UNESCAPED_SLASHES);
@@ -438,7 +432,7 @@ function get_file_list($app, $versionName)
 	return $response;
 }
 
-function check_version($app, $versionName)
+function get_check_version($app, $versionName)
 {
 	$ver = $app->checkVersionName($versionName);
 	$response = array("response" => array('version' => $ver));
